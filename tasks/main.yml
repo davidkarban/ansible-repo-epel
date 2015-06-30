@@ -1,0 +1,19 @@
+---
+# tasks file for repo-epel
+- name: Ensure EPEL repository is available
+  tags: EPEL
+  copy: src={{ item + '.repo.' + ansible_lsb.major_release }} dest=/etc/yum.repos.d/{{ item + '.repo' }}
+  with_items:
+    - epel
+    - epel-testing
+  when: ansible_distribution != "CentOS" 
+
+- name: Loading EPEL gpg keys
+  tags: EPEL
+  copy: src={{ 'RPM-GPG-KEY-EPEL-' + ansible_lsb.major_release }} dest=/etc/pki/rpm-gpg/
+  when: ansible_distribution != "CentOS" 
+
+- name: Ensure EPEL repository is available
+  tags: EPEL
+  yum: pkg=epel-release state=present
+  when: ansible_distribution == "CentOS" 
